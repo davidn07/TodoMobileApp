@@ -1,6 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { StyleSheet, View, FlatList, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableWithoutFeedback,
+  Alert,
+  Keyboard,
+} from "react-native";
 import Header from "./components/Header";
 import TodoItem from "./components/TodoItem";
 import Addtodo from "./components/Addtodo";
@@ -17,28 +24,36 @@ export default function App() {
       return todos.filter((todo) => todo.key !== id);
     });
   };
+
   const AddTodo = (text) => {
-    setTodos((prevTodos) => {
-      return [{ text: text, key: Math.random().toString() }, ...prevTodos];
-    });
+    if (text.length > 3) {
+      setTodos((prevTodos) => {
+        return [{ text: text, key: Math.random().toString() }, ...prevTodos];
+      });
+    } else {
+      Alert.alert("ooppss!!", "Todos must atleast 3 chars long", [
+        { text: "Understood", onPress: () => console.log("Close Alert") },
+      ]);
+    }
   };
+
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Header />
-      <View style={styles.content}>
-        {/* to do form */}
-        <Addtodo AddTodo={AddTodo} />
-        <View style={styles.list}>
-          <FlatList
-            data={todos}
-            renderItem={({ item }) => (
-              <TodoItem item={item} removeTodo={removeTodo} />
-            )}
-          />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <Header />
+        <View style={styles.content}>
+          <Addtodo AddTodo={AddTodo} />
+          <View style={styles.list}>
+            <FlatList
+              data={todos}
+              renderItem={({ item }) => (
+                <TodoItem item={item} removeTodo={removeTodo} />
+              )}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -49,8 +64,10 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 40,
+    flex: 1,
   },
   list: {
     marginTop: 20,
+    flex: 1,
   },
 });
